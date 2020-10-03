@@ -1,0 +1,54 @@
+name: 'Artistic Style'
+description: 'Check code formatting using Artistic Style.'
+
+inputs:
+  options-file-path:
+    description: 'Path to the options file.'
+    default: 'none'
+    required: false
+  name-patterns:
+    description: 'YAML formatted list of name patterns (e.g., *.cpp) of the files to be checked.'
+    required: true
+  target-paths:
+    description: 'YAML formatted list of paths to check recursively.'
+    default: './'
+    required: false
+  exclude-paths:
+    description: 'YAML formatted list of paths to exclude from the check.'
+    default: ''
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: 'Install Artistic style'
+      env:
+        # See: https://sourceforge.net/projects/astyle/files/astyle/
+        ASTYLE_VERSION: '3.1'
+        ASTYLE_BUILD_PATH: "${{ runner.temp }}/astyle"
+      shell: 'bash'
+      run: |
+        ASTYLE_DOWNLOAD_FILENAME="astyle_${{ env.ASTYLE_VERSION }}_linux.tar.gz"
+        wget \
+          --quiet \
+          --directory-prefix="${{ env.ASTYLE_BUILD_PATH }}" \
+          "https://iweb.dl.sourceforge.net/project/astyle/astyle/astyle%20${{ env.ASTYLE_VERSION }}/$ASTYLE_DOWNLOAD_FILENAME"
+        # Build Artistic Style
+        cd "${{ env.ASTYLE_BUILD_PATH }}"
+        tar --extract --file="$ASTYLE_DOWNLOAD_FILENAME"
+        cd "${{ env.ASTYLE_BUILD_PATH }}/astyle/build/gcc"
+        make --silent
+        sudo mv "${{ env.ASTYLE_BUILD_PATH }}/astyle/build/gcc/bin/astyle" /usr/bin
+        astyle --version
+    - name: 'Install yq'
+      shell: 'bash'
+      run: |
+        sudo snap install yq
+    - name: 'Check formatting'
+      shell: 'bash'
+      run: |
+        "${{ github.action_path }}/artistic-style-check.sh" \
+          "${{ inputs.options-file-path }}" \
+          "${{ inputs.name-patterns }}" \
+          "${{ inputs.target-paths }}" \
+          "${{ inputs.exclude-paths }}"
