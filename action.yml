@@ -1,5 +1,8 @@
 name: "Artistic Style"
 description: "Check code formatting using Artistic Style."
+branding:
+  icon: at-sign
+  color: purple
 
 inputs:
   options-file-path:
