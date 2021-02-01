@@ -12,7 +12,7 @@ jobs:
   check-formatting:
     steps:
       - uses: actions/checkout@v2
-      - uses: per1234/artistic-style-action@main
+      - uses: per1234/artistic-style-action@v1
         with:
           name-patterns: |
             - '*.cpp'
