@@ -1,0 +1,34 @@
+name: Check Shell Script Formatting
+
+# See: https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows
+on:
+  push:
+    paths:
+      - ".github/workflows/check-shell-formatting.yml"
+      - ".editorconfig"
+      - "**.sh"
+  pull_request:
+    paths:
+      - ".github/workflows/check-shell-formatting.yml"
+      - ".editorconfig"
+      - "**.sh"
+  schedule:
+    # Run every Tuesday at 8 AM UTC to catch breakage caused by changes to shfmt.
+    - cron: "0 8 * * TUE"
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Format shell scripts
+        # https://github.com/mvdan/sh
+        run: docker run --volume "${{ github.workspace }}":/mnt --workdir /mnt mvdan/shfmt:latest -w .
+
+      - name: Check formatting
+        run: git diff --color --exit-code
