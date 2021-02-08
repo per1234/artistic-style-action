@@ -14,11 +14,11 @@ inputs:
     required: true
   target-paths:
     description: "YAML formatted list of paths to check recursively."
-    default: "./"
+    default: "- ./"
     required: false
   exclude-paths:
     description: "YAML formatted list of paths to exclude from the check."
-    default: ""
+    default: "-"
     required: false
 
 runs:

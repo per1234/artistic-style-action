@@ -19,26 +19,26 @@ while IFS='' read -r targetPath && [[ -n "$targetPath" ]]; do
     echo "::error::Target path: $targetPath doesn't exist"
     exit 1
   fi
-done <<<"$(echo "$targetPaths" | yq read - [*])"
+done <<<"$(echo "$targetPaths" | yq eval '.[]' -)"
 
 while IFS='' read -r excludePath && [[ -n "$excludePath" ]]; do
   if ! [[ -d "$excludePath" ]]; then
     echo "::error::Exclude path: $excludePath doesn't exist"
     exit 1
   fi
-done <<<"$(echo "$excludePaths" | yq read - [*])"
+done <<<"$(echo "$excludePaths" | yq eval '.[]' -)"
 
 # Assemble the find options for the file name patterns
 while IFS='' read -r namePattern && [[ -n "$namePattern" ]]; do
   namePatternOptions="$namePatternOptions -name ""'""$namePattern""'"" -or"
-done <<<"$(echo "$namePatterns" | yq read - [*])"
+done <<<"$(echo "$namePatterns" | yq eval '.[]' -)"
 # Handle the trailing -or
 namePatternOptions="$namePatternOptions -false"
 
 # Assemble the find options for the excluded paths
 while IFS='' read -r excludePath && [[ -n "$excludePath" ]]; do
   excludeOptions="$excludeOptions -path $excludePath -prune -or"
-done <<<"$(echo "$excludePaths" | yq read - [*])"
+done <<<"$(echo "$excludePaths" | yq eval '.[]' -)"
 
 # Set default exit status
 exitStatus=0
@@ -58,6 +58,6 @@ while IFS='' read -r targetPath && [[ -n "$targetPath" ]]; do
       fi
     fi
   done <<<"$(eval "find $targetPath $excludeOptions \( $namePatternOptions -and -type f \)")"
-done <<<"$(echo "$targetPaths" | yq read - [*])"
+done <<<"$(echo "$targetPaths" | yq eval '.[]' -)"
 
 exit "$exitStatus"
