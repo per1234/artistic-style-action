@@ -1,0 +1,112 @@
+name: Integration Tests
+
+# See: https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows
+on:
+  pull_request:
+  push:
+  schedule:
+    # Run every Tuesday at 3 AM UTC to catch breakage caused by changes to external resources.
+    - cron: "0 3 * * 2"
+  workflow_dispatch:
+  repository_dispatch:
+
+env:
+  OPTIONS_FILE_PATH: .github/workflows/testdata/.astylerc
+  TESTDATA_PATH: .github/workflows/testdata
+
+jobs:
+  expected-pass:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout local repository
+        uses: actions/checkout@v2
+
+      - name: Run action
+        uses: ./ # Use the action from the local path.
+        with:
+          options-file-path: ${{ env.OPTIONS_FILE_PATH }}
+          name-patterns: |
+            - '*.cpp'
+            - '*.h'
+          target-paths: |
+            - ${{ env.TESTDATA_PATH }}/compliant-cpp-non-compliant-c
+            - ${{ env.TESTDATA_PATH }}/compliant-cpp-with-non-compliant-cpp-subfolder
+          exclude-paths: |
+            - ${{ env.TESTDATA_PATH }}/compliant-cpp-with-non-compliant-cpp-subfolder/non-compliant-cpp
+
+  expected-fail-multiple-paths:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout local repository
+        uses: actions/checkout@v2
+
+      - name: Run action
+        id: astyle
+        continue-on-error: true
+        uses: ./
+        with:
+          options-file-path: ${{ env.OPTIONS_FILE_PATH }}
+          target-paths: |
+            - ${{ env.TESTDATA_PATH }}/compliant-cpp-1
+            - ${{ env.TESTDATA_PATH }}/non-compliant-cpp
+            - ${{ env.TESTDATA_PATH }}/compliant-cpp-2
+          name-patterns: |
+            - '*.cpp'
+
+      - name: Fail the job if the action run succeeded
+        if: steps.astyle.outcome == 'success'
+        run: |
+          echo "::error::The action run was expected to fail, but passed!"
+          exit 1
+
+  expected-fail-recursion:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout local repository
+        uses: actions/checkout@v2
+
+      - name: Run action
+        id: astyle
+        continue-on-error: true
+        uses: ./
+        with:
+          options-file-path: ${{ env.OPTIONS_FILE_PATH }}
+          target-paths: |
+            - ${{ env.TESTDATA_PATH }}/compliant-cpp-with-non-compliant-cpp-subfolder
+          name-patterns: |
+            - '*.cpp'
+
+      - name: Fail the job if the action run succeeded
+        if: steps.astyle.outcome == 'success'
+        run: |
+          echo "::error::The action run was expected to fail, but passed!"
+          exit 1
+
+  expected-fail-multiple-patterns:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout local repository
+        uses: actions/checkout@v2
+
+      - name: Run action
+        id: astyle
+        continue-on-error: true
+        uses: ./
+        with:
+          options-file-path: ${{ env.OPTIONS_FILE_PATH }}
+          target-paths: |
+            - ${{ env.TESTDATA_PATH }}/compliant-cpp-non-compliant-c
+          name-patterns: |
+            - '*.cpp'
+            - '*.c'
+            - '*.h'
+
+      - name: Fail the job if the action run succeeded
+        if: steps.astyle.outcome == 'success'
+        run: |
+          echo "::error::The action run was expected to fail, but passed!"
+          exit 1
