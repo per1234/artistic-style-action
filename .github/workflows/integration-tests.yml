@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout local repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
 
       - name: Run action
         uses: ./ # Use the action from the local path.
@@ -40,7 +40,7 @@ jobs:
 
     steps:
       - name: Checkout local repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
 
       - name: Run action
         id: astyle
@@ -66,7 +66,7 @@ jobs:
 
     steps:
       - name: Checkout local repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
 
       - name: Run action
         id: astyle
@@ -90,7 +90,7 @@ jobs:
 
     steps:
       - name: Checkout local repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
 
       - name: Run action
         id: astyle
