@@ -32,12 +32,13 @@ runs:
       shell: "bash"
       run: |
         ASTYLE_DOWNLOAD_FILENAME="astyle_${{ env.ASTYLE_VERSION }}_linux.tar.gz"
+        mkdir -p "${{ env.ASTYLE_BUILD_PATH }}"
+        cd "${{ env.ASTYLE_BUILD_PATH }}"
         wget \
           --quiet \
-          --directory-prefix="${{ env.ASTYLE_BUILD_PATH }}" \
-          "https://cfhcable.dl.sourceforge.net/project/astyle/astyle/astyle%20${{ env.ASTYLE_VERSION }}/$ASTYLE_DOWNLOAD_FILENAME"
+          --output-document="$ASTYLE_DOWNLOAD_FILENAME" \
+          "https://sourceforge.net/projects/astyle/files/astyle/astyle%20${{ env.ASTYLE_VERSION }}/$ASTYLE_DOWNLOAD_FILENAME/download?use_mirror=phoenixnap"
         # Build Artistic Style
-        cd "${{ env.ASTYLE_BUILD_PATH }}"
         tar --extract --file="$ASTYLE_DOWNLOAD_FILENAME"
         cd "${{ env.ASTYLE_BUILD_PATH }}/astyle/build/gcc"
         make --silent
