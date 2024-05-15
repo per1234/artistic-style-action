@@ -48,7 +48,9 @@ while IFS='' read -r targetPath && [[ -n "$targetPath" ]]; do
     # Check if it's a file (find matches on pruned folders)
     if [[ -f "$filename" ]]; then
       echo "::group::Checking $filename"
-      if ! diff --strip-trailing-cr "$filename" <(astyle --options="$optionsFilePath" --dry-run <"$filename"); then
+      diffOutput=$(diff --strip-trailing-cr "$filename" <(astyle --options="$optionsFilePath" --dry-run <"$filename"))
+      if [[ -n "$diffOutput" ]]; then
+        echo "$diffOutput"
         echo "::endgroup::"
         echo "::error::Non-compliant code formatting in $filename"
         # Make the function fail
