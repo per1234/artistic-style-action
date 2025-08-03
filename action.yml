@@ -35,7 +35,7 @@ runs:
         wget \
           --quiet \
           --directory-prefix="${{ env.ASTYLE_BUILD_PATH }}" \
-          "https://cfhcable.dl.sourceforge.net/project/astyle/astyle/astyle%20${{ env.ASTYLE_VERSION }}/$ASTYLE_DOWNLOAD_FILENAME"
+          "https://downloads.sourceforge.net/project/astyle/astyle/astyle%20${{ env.ASTYLE_VERSION }}/$ASTYLE_DOWNLOAD_FILENAME"
         # Build Artistic Style
         cd "${{ env.ASTYLE_BUILD_PATH }}"
         tar --extract --file="$ASTYLE_DOWNLOAD_FILENAME"
